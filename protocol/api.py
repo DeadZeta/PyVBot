@@ -4,13 +4,13 @@ import config
 from random import randint
 
 VK_API_URL = "https://api.vk.com/method/"
-header = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'}
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0'}
 
 def send(method: str, params: dict):
     params['access_token'] = config.access_token,
     params['v'] = config.version,
 
-    response = requests.post(VK_API_URL + method, data = params, headers=header)
+    response = requests.post(VK_API_URL + method, data = params, headers=headers)
 
     if response.status_code != 200:
         print("Error: status code is not 200")
@@ -22,23 +22,25 @@ def send(method: str, params: dict):
 
     return loads(response.text)
 
-def send_server(server: str, key: str, ts: int):
+def send_server(system, longpoll: dict):
     act = 'a_check',
-    wait = 25
+    wait = 5
 
-    response = requests.get(server, params={'act': act, 'wait': wait, 'key': key, 'ts': ts}, headers=header)
+    response = requests.get(longpoll['server'], params={'act': act, 'wait': wait, 'key': longpoll['key'], 'ts': longpoll['ts']}, headers=headers)
 
     if response.status_code != 200:
         print("Error: status code is not 200")
         exit()
 
-    if response.text == '':
+    if response.text == '' or None:
         print("Warning: Server return Empty text")
         return {}
 
-    if loads(response.text).get('failed') == 2:
-        print("Warning: failed request server")
-        return {}
+    if loads(response.text).get('failed') is not None:
+        if loads(response.text).get('failed') != 1:
+            system['reconnect'] = True
+
+            return {}
 
     return loads(response.text)
 
