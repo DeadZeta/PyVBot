@@ -1,4 +1,4 @@
-import protocol.api as api
+from protocol.api import base, bot
 import config
 from bot.handler import handle
 import time
@@ -16,7 +16,7 @@ system = {
 }
 
 def init():
-    server = api.get_server(config.group_id)
+    server = bot.get_server(config.group_id)
 
     longpoll['key'] = server['response'].get('key')
     longpoll['server'] = server['response'].get('server')
@@ -27,7 +27,7 @@ def init():
 def listen():
     while True:
         if system.get('reconnect') == True:
-            server = api.get_server(config.group_id)
+            server = bot.get_server(config.group_id)
 
             longpoll['key'] = server['response'].get('key')
             longpoll['server'] = server['response'].get('server')
@@ -39,7 +39,7 @@ def listen():
             exit()
             break
 
-        server = api.send_server(system, longpoll)
+        server = base.send_server(system, longpoll)
 
         if server.get('updates') is None:
             continue
