@@ -57,6 +57,11 @@ def send_server(system, longpoll: dict):
             system['reconnect'] = True
 
             return {}
+        else:
+            system['connect_back'] = True
+            longpoll['ts'] = loads(response.text).get('ts')
+
+            return {}
 
     return loads(response.text)
 

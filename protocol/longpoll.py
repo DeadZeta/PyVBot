@@ -11,6 +11,7 @@ longpoll = {
 }
 
 system = {
+    'connect_back': False,
     'reconnect': False,
     'stop': False
 }
@@ -34,6 +35,13 @@ def listen():
             longpoll['ts'] = server['response'].get('ts')
             system['reconnect'] = False
 
+        if system.get('connect_back') == True:
+            server = bot.get_server(config.group_id)
+
+            longpoll['key'] = server['response'].get('key')
+            longpoll['server'] = server['response'].get('server')
+            system['reconnect'] = False
+
         if system.get('stop') == True:
             system['stop'] = False
             exit()
@@ -45,6 +53,9 @@ def listen():
             continue
 
         if len(server.get('updates')) == 0:
+            if longpoll['ts'] == server.get('ts'):
+                continue
+
             longpoll['ts'] += 1
             continue
 

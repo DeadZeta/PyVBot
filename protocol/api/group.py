@@ -1,10 +1,20 @@
 from protocol.api.base import user_send_api, group_send_api, rand
 from time import time as unixtime
+from json import dumps
 
 def send_message(peer_id: int, message: str):
     return group_send_api('messages.send', {
         'peer_id': peer_id,
         'message': message,
+        'random_id': rand()
+    })
+
+def send_message_keyboard(peer_id: int, message: str,
+                          keyboard: dict = {'one_time': True, 'buttons': []}):
+    return group_send_api('messages.send', {
+        'peer_id': peer_id,
+        'message': message,
+        'keyboard': dumps(keyboard),
         'random_id': rand()
     })
 
